@@ -104,7 +104,7 @@ void free_adjlist(adjlist *g){
 
 //Make the 2 subgraphs of graph g using the labels "lab"
 clusters mkkids(adjlist* g, bool* lab){
-	unsigned long i,e1=NLINKS,e2=NLINKS;
+	unsigned long i,e1=g->e/2,e2=g->e/2;
 
 	clusters clust;
 	clust.n=2;
@@ -122,14 +122,14 @@ clusters mkkids(adjlist* g, bool* lab){
 			if (lab[g->edges[i].s]==0){
 				clust.sg[0]->edges[clust.sg[0]->e]=g->edges[i];
 				if (clust.sg[0]->e++==e1) {
-					e1+=NLINKS;
+					e1*=2;
 					clust.sg[0]->edges=realloc(clust.sg[0]->edges,e1*sizeof(edge));
 				}
 			}
 			else{
 				clust.sg[1]->edges[clust.sg[1]->e]=g->edges[i];
 				if (clust.sg[1]->e++==e2) {
-					e2+=NLINKS;
+					e2*=2;
 					clust.sg[1]->edges=realloc(clust.sg[1]->edges,e2*sizeof(edge));
 				}
 			}
@@ -175,12 +175,10 @@ void recurs(bisection bisec, adjlist* g, unsigned long n,FILE* file){
 		lab=bisec(g);
 		clust=mkkids(g,lab);
 		free(lab);
+		free_adjlist(g);
 
 		recurs(bisec, clust.sg[0],2*n,file);
-		free_adjlist(clust.sg[0]);
-
 		recurs(bisec, clust.sg[1],2*n+1,file);
-		free_adjlist(clust.sg[1]);
 	}
 }
 
