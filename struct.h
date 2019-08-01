@@ -10,6 +10,7 @@ typedef struct {
 typedef struct {
 	unsigned long n;//number of nodes
 	unsigned long e;//number of edges
+	unsigned long *nodes;//list of nodes
 	edge *edges;//list of edges
 	unsigned long *cd;//cumulative degree cd[0]=0 length=n+1
 	unsigned long *adj;//concatenated lists of neighbors of all nodes
@@ -20,5 +21,12 @@ typedef struct {
 	unsigned n;//number of clusters
 	adjlist** sg;//sg[i]=pointer to adjlist of cluster i
 } clusters;
+
+
+typedef struct {
+	unsigned long n;
+	unsigned long nmax;
+	unsigned* t;
+} table;
 
 #endif

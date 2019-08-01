@@ -69,7 +69,7 @@ bool *greedySparsestcut(adjlist *g) {
 	} while (b);
 
 	//printf("Number of iterations = %u\n",iter);
-
+//printf("n s = %lu %lu\n",n,s);
 	return lab;
 }
 
