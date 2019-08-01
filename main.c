@@ -115,7 +115,7 @@ table* alloctab(){
 //Make the 2 subgraphs of graph g using the labels "lab"
 clusters mkkids(adjlist* g, bool* lab){
 	unsigned long i,e1=g->e/2+1,e2=g->e/2+1;
-//printf("%lu %lu\n",e1,e2);
+
 	clusters clust;
 	clust.n=2;
 	clust.sg=malloc(clust.n*sizeof(adjlist*));
@@ -138,7 +138,7 @@ clusters mkkids(adjlist* g, bool* lab){
 
 	clust.sg[0]->edges=malloc(e1*sizeof(edge));
 	clust.sg[1]->edges=malloc(e2*sizeof(edge));
-//printf("y\n");
+	
 	clust.sg[0]->e=0;
 	clust.sg[1]->e=0;
 	for (i=0;i<g->e;i++) {
@@ -159,22 +159,16 @@ clusters mkkids(adjlist* g, bool* lab){
 			}
 		}
 	}
-//printf("zzzzz %lu %lu\n",clust.sg[0]->e,clust.sg[1]->e);
 	clust.sg[0]->edges=realloc(clust.sg[0]->edges,clust.sg[0]->e*sizeof(edge));
 	clust.sg[1]->edges=realloc(clust.sg[1]->edges,clust.sg[1]->e*sizeof(edge));
-//printf("za\n");
 	mkadjlist(clust.sg[0]);
-//printf("ze\n");
 	for (i=0;i<clust.sg[0]->n;i++){
 		clust.sg[0]->map[i]=g->map[clust.sg[0]->map[i]];
 	}
-//printf("bi\n");
 	mkadjlist(clust.sg[1]);
-//printf("bi\n");
 	for (i=0;i<clust.sg[1]->n;i++){
 		clust.sg[1]->map[i]=g->map[clust.sg[1]->map[i]];
 	}
-//printf("te\n");
 	return clust;
 }
 
@@ -185,11 +179,8 @@ void recurs(bisection bisec, adjlist* g, unsigned h, FILE* file){
 	bool* lab;
 	unsigned long i;
 	if (g->e>0){
-//printf("outaaaa\n");
 		lab=bisec(g);
-//printf("outb\n");
 		clust=mkkids(g,lab);
-//printf("outc\n");
 		fprintf(file,"%u 2\n",h);
 		free(lab);
 		free_adjlist(g);
@@ -197,12 +188,12 @@ void recurs(bisection bisec, adjlist* g, unsigned h, FILE* file){
 		recurs(bisec, clust.sg[1], h+1, file);
 	}
 	else{
-//printf("outb\n");
 		fprintf(file,"%u 1 %lu",h,g->n);
 		for (i=0;i<g->n;i++){
 			fprintf(file," %lu",g->map[i]);
 		}
 		fprintf(file,"\n");
+		free_adjlist(g);
 	}
 	
 }
