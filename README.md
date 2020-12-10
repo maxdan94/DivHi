@@ -29,7 +29,6 @@ option "bisection": the algorithm to use, default is 1.
 
 ## Initial contributor:
 Maximilien Danisch  
-Technical consultants: Ayan Bhowmick, Bivas Mitra and Jean-Loup Guillaume  
 December 2018  
 http://bit.ly/danisch  
 maximilien.danisch@gmail.com
