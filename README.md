@@ -3,7 +3,8 @@
 
 Feel free to use these lines as you wish.
 Computes a hierarchical clustering.
-DivHi pronounce "Dive high".
+DivHi pronounce "Dive high".  
+Maybe should be changed into "High Dive": https://en.wikipedia.org/wiki/High_diving
 
 ## To compile:
 
