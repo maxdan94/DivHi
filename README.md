@@ -4,7 +4,7 @@
 Feel free to use these lines as you wish.
 Computes a hierarchical clustering.
 DivHi pronounce "Dive high".  
-Maybe should be changed into "High Dive": https://en.wikipedia.org/wiki/High_diving
+Maybe the name of the code should be changed into "High Dive": https://en.wikipedia.org/wiki/High_diving
 
 ## To compile:
 
@@ -29,9 +29,7 @@ option "bisection": the algorithm to use, default is 1.
 - 3: greedy max cut
 - 4: greedy min cut
 - 5: greedy min cut in the complement
-- 6 minimum of 4 and 5
-
-## 
+- 6: minimum of 4 and 5 (using this function leads to a heuristic for computing the cograph edit distances)
 
 ## Initial contributor:
 Maximilien Danisch  
