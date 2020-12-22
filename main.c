@@ -172,6 +172,26 @@ clusters mkkids(adjlist* g, bool* lab){
 	return clust;
 }
 
+bool* severaltimes(bisection bisec,unsigned k,adjlist* g){
+	static double totcut=0;
+	double val1,val2;
+	bool *lab1=bisec(g,&val1),*lab2;
+	unsigned i;
+	for (i=0;i<k;i++){
+		lab2=bisec(g,&val2);
+		if (val2<val1){
+			val1=val2;
+			free(lab1);
+			lab1=lab2;
+		}
+		else{
+			free(lab2);
+		}
+	}
+	totcut+=val1;
+	printf("sum of cuts = %lf\n",totcut);
+	return lab1;
+}
 
 //recursive function
 void recurs(bisection bisec, adjlist* g, unsigned h, FILE* file){
@@ -179,7 +199,7 @@ void recurs(bisection bisec, adjlist* g, unsigned h, FILE* file){
 	bool* lab;
 	unsigned long i;
 	if (g->e>0){
-		lab=bisec(g);
+		lab=severaltimes(bisec,5,g);////////////////
 		clust=mkkids(g,lab);
 		fprintf(file,"%u 2\n",h);
 		free(lab);

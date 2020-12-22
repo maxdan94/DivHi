@@ -23,7 +23,7 @@ bool *init(adjlist *g){
 }
 
 //A greedy heuristic for sparsest cut
-bool *greedySparsestcut(adjlist *g) {
+bool *greedySparsestcut(adjlist *g, double* val) {
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut=0;
 	unsigned iter=0;
@@ -89,11 +89,12 @@ bool *greedySparsestcut(adjlist *g) {
 	//printf("Number of iterations = %u\n",iter);
 	free(d0);
 	free(d1);
+	*val=cut/(s*(n-s));
 	return lab;
 }
 
 //A greedy heuristic for densest cut
-bool *greedyDensestcut(adjlist *g) {
+bool *greedyDensestcut(adjlist *g,double* val) {
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut=0;
 	unsigned iter=0;
@@ -160,13 +161,14 @@ bool *greedyDensestcut(adjlist *g) {
 
 	free(d0);
 	free(d1);
+	*val=-cut/(s*(n-s));
 	return lab;
 }
 
 
 
 //A greedy heuristic for maxcut
-bool *greedyMaxcut(adjlist *g) {
+bool *greedyMaxcut(adjlist *g,double *val) {
 	unsigned long n=g->n,u,v,i;
 	double cut=0;
 	unsigned iter=0;
@@ -225,13 +227,14 @@ bool *greedyMaxcut(adjlist *g) {
 
 	free(d0);
 	free(d1);
+	*val=cut;
 	return lab;
 }
 
 
 
 //A greedy heuristic for min cut of the complement graph
-bool *greedyMincut(adjlist *g) {
+bool *greedyMincut(adjlist *g,double *val) {
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut=0;
 	unsigned iter=0;
@@ -298,13 +301,14 @@ bool *greedyMincut(adjlist *g) {
 	//printf("cut, s, n-s = %lf %lu %lu\n",cut,s,n-s);
 	free(d0);
 	free(d1);
+	*val=cut;
 	return lab;
 }
 
 
 
 //A greedy heuristic for min cut of the complement graph
-bool *greedyCompmincut(adjlist *g) {
+bool *greedyCompmincut(adjlist *g,double* val) {
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut=0;
 	unsigned iter=0;
@@ -371,17 +375,79 @@ bool *greedyCompmincut(adjlist *g) {
 	//printf("cut, s, n-s, s*(n-s)-cut = %lf %lu %lu %lf\n",cut,s,n-s,s*(n-s)-cut);
 	free(d0);
 	free(d1);
+	*val=cut-(s*(n-s));
 	return lab;
 }
 
 
 
-bool *greedyMinmin(adjlist *g) {
+bool *greedyMinmin(adjlist *g,double* val) {
 	static double totcut1=0,totcut2=0;
+	unsigned long n=g->n,u,v,i,s1=0,s2=0;
+	double cut1=0,cut2=0;
+	double val1,val2;
+	bool *lab1=greedyMincut(g,&val1);
+	bool *lab2=greedyCompmincut(g,&val2);
+	static FILE *f=NULL;
+	if (f==NULL)
+		f=fopen("graph.txt","w");
+
+	for (u=0;u<n;u++){
+		if (lab1[u]==0){
+			s1++;
+		}
+		if (lab2[u]==0){
+			s2++;
+		}
+	}
+	for (i=0;i<g->e;i++){
+		u=g->edges[i].s;
+		v=g->edges[i].t;
+		if (lab1[u]!=lab1[v]){
+			cut1++;
+		}
+		if (lab2[u]!=lab2[v]){
+			cut2++;
+		}
+	}
+	if (cut1<s2*(n-s2)-cut2){
+		//printf("s, n-s, cut = %lu %lu %lf\n",s1,n-s1,cut1);
+		//totcut1+=cut1;
+		//printf("number of deletions = %lf\n",totcut1);
+		//printf("number of additions = %lf\n",totcut2);
+		//printf("number of editions = %lf\n",totcut1+totcut2);
+/*////////////
+	for (i=0;i<g->e;i++){
+		u=g->edges[i].s;
+		v=g->edges[i].t;
+		if (lab1[u]!=lab1[v]){
+			fprintf(f,"%lu %lu\n",g->map[u],g->map[v]);
+		}
+	}
+*////////////
+		free(lab2);
+		*val=cut1;
+		return lab1;
+	}
+
+	//printf("s, n-s, s*(n-s)-cut  = %lu %lu %lf\n",s2,n-s2,s2*(n-s2)-cut2 );
+	totcut2+=s2*(n-s2)-cut2;
+	//printf("number of deletions = %lf\n",totcut1);
+	//printf("number of additions = %lf\n",totcut2);
+	//printf("number of editions = %lf\n",totcut1+totcut2);
+	free(lab1);
+	*val=s2*(n-s2)-cut2;
+	return lab2;
+}
+
+
+bool *greedyMinmin2(adjlist *g,double* val) {
+	static double totcut1=0;
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut1=0,cut2=0;
-	bool *lab1=greedyMincut(g);
-	bool *lab2=greedyCompmincut(g);
+	double val1,val2;
+	bool *lab1=greedyMincut(g,&val1);
+	bool *lab2=greedyCompmincut(g,&val2);
 	static FILE *f=NULL;
 	if (f==NULL)
 		f=fopen("graph.txt","w");
@@ -397,16 +463,19 @@ bool *greedyMinmin(adjlist *g) {
 		if (lab1[u]!=lab1[v]){
 			cut1++;
 		}
-		if (lab2[u]!=lab2[v]){
+		if (lab2[u]==lab2[v]){
 			cut2++;
 		}
 	}
-	if (cut1<s*(n-s)-cut2){
-		printf("s, n-s, cut = %lu %lu %lf\n",s,n-s,cut1);
-		totcut1+=cut1;
-		printf("number of deletions = %lf\n",totcut1);
-		printf("number of additions = %lf\n",totcut2);
-		printf("number of editions = %lf\n",totcut1+totcut2);
+	if (cut2<1){
+		*val=cut2;
+		return lab2;
+	}
+
+
+	printf("s, n-s, cut = %lu %lu %lf\n",s,n-s,cut1);
+	totcut1+=cut1;
+	printf("number of deletions = %lf\n",totcut1);
 /////////////
 	for (i=0;i<g->e;i++){
 		u=g->edges[i].s;
@@ -416,16 +485,11 @@ bool *greedyMinmin(adjlist *g) {
 		}
 	}
 ////////////
-		return lab1;
-	}
+	*val=cut1;
+	return lab1;
 
-	printf("s, n-s, s*(n-s)-cut  = %lu %lu %lf\n",s,n-s,s*(n-s)-cut2 );
-	totcut2+=s*(n-s)-cut2;
-	printf("number of deletions = %lf\n",totcut1);
-	printf("number of additions = %lf\n",totcut2);
-	printf("number of editions = %lf\n",totcut1+totcut2);
-	return lab2;
 }
+
 
 
 bisection choosebisection(char *c){
@@ -457,6 +521,10 @@ bisection choosebisection(char *c){
 	if (strcmp(c,"6")==0){
 		printf("Greedy minimum between Mincut and CompMincut\n");
 		return greedyMinmin;
+	}
+	if (strcmp(c,"7")==0){
+		printf("Greedy minimum between Mincut and CompMincut (CompMincut=0 only)\n");
+		return greedyMinmin2;
 	}
 	printf("unknown\n");
 	exit(1);

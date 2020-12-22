@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef bool* (*bisection)(adjlist*);
+typedef bool* (*bisection)(adjlist*,double*);
 bisection choosebisection(char*);
 
 #endif
