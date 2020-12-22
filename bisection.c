@@ -377,11 +377,14 @@ bool *greedyCompmincut(adjlist *g) {
 
 
 bool *greedyMinmin(adjlist *g) {
-	static double totcut=0;
+	static double totcut1=0,totcut2=0;
 	unsigned long n=g->n,u,v,i,s=0;
 	double cut1=0,cut2=0;
 	bool *lab1=greedyMincut(g);
 	bool *lab2=greedyCompmincut(g);
+	static FILE *f=NULL;
+	if (f==NULL)
+		f=fopen("graph.txt","w");
 
 	for (u=0;u<n;u++){
 		if (lab2[u]==0){
@@ -400,16 +403,28 @@ bool *greedyMinmin(adjlist *g) {
 	}
 	if (cut1<s*(n-s)-cut2){
 		printf("s, n-s, cut = %lu %lu %lf\n",s,n-s,cut1);
-		totcut+=cut1;
-		printf("totalcut = %lf\n",totcut);
+		totcut1+=cut1;
+		printf("number of deletions = %lf\n",totcut1);
+		printf("number of additions = %lf\n",totcut2);
+		printf("number of editions = %lf\n",totcut1+totcut2);
+/////////////
+	for (i=0;i<g->e;i++){
+		u=g->edges[i].s;
+		v=g->edges[i].t;
+		if (lab1[u]!=lab1[v]){
+			fprintf(f,"%lu %lu\n",g->map[u],g->map[v]);
+		}
+	}
+////////////
 		return lab1;
 	}
 
 	printf("s, n-s, s*(n-s)-cut  = %lu %lu %lf\n",s,n-s,s*(n-s)-cut2 );
-	totcut+=s*(n-s)-cut2;
-	printf("totalcut = %lf\n",totcut);
+	totcut2+=s*(n-s)-cut2;
+	printf("number of deletions = %lf\n",totcut1);
+	printf("number of additions = %lf\n",totcut2);
+	printf("number of editions = %lf\n",totcut1+totcut2);
 	return lab2;
-	
 }
 
 
